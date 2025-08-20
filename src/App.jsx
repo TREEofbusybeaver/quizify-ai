@@ -1,13 +1,15 @@
 // src/App.jsx
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar'; // We will create this
+import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
-import ProtectedRoute from './components/ProtectedRoute';
 import DashboardPage from './pages/DashboardPage';
-import NotFoundPage from './pages/NotFoundPage';
+import QuizEditorPage from './pages/QuizEditorPage';
 import TakeQuizPage from './pages/TakeQuizPage';
+import NotFoundPage from './pages/NotFoundPage';
+
 // ... import other pages
 
 function App() {
