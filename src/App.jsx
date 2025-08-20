@@ -7,6 +7,7 @@ import SignUpPage from './pages/SignUpPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardPage from './pages/DashboardPage';
 import NotFoundPage from './pages/NotFoundPage';
+import TakeQuizPage from './pages/TakeQuizPage';
 // ... import other pages
 
 function App() {
