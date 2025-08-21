@@ -54,7 +54,8 @@ export default function DashboardPage() {
   };
 
   const copyToClipboard = (quizId) => {
-    const link = `${window.location.origin}/quiz/${quizId}`;
+    const baseUrl = import.meta.env.VITE_PUBLIC_URL; // <<< NEW LINE
+    const link = `${baseUrl}/quiz/${quizId}`;        // <<< UPDATED LINE
     navigator.clipboard.writeText(link);
     toast.success("Shareable link copied!");
   };
@@ -102,7 +103,7 @@ export default function DashboardPage() {
                 <div className="mb-6">
                   <p className="text-sm text-gray-400 mb-1">Shareable Link:</p>
                   <div className="flex gap-2">
-                    <input type="text" readOnly value={`${window.location.origin}/quiz/${selectedQuiz.id}`} className="w-full bg-gray-700 text-gray-300 p-2 rounded-md border border-gray-600"/>
+                    <input type="text" readOnly value={`${import.meta.env.VITE_PUBLIC_URL}/quiz/${quiz.id}`}  className="w-full bg-gray-700 text-gray-300 p-2 rounded-md border border-gray-600"/>
                     <button onClick={() => copyToClipboard(selectedQuiz.id)} className="bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded-md transition duration-200">Copy</button>
                   </div>
                 </div>
