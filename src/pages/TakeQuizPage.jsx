@@ -38,7 +38,7 @@ export default function TakeQuizPage() {
             setQuizError("This quiz has been deactivated by the creator.");
           } else {
             setQuiz({ id: docSnap.id, ...quizData });
-            // Initialize answer state correctly
+            // Initialize answer state for all questions to avoid errors
             const initialAnswers = {};
             quizData.questions.forEach((q, index) => {
               initialAnswers[index] = q.questionType === 'multiple' ? [] : undefined;
@@ -69,7 +69,7 @@ export default function TakeQuizPage() {
     const currentSelection = selectedAnswers[qIndex];
 
     if (question.questionType === 'multiple') {
-      const newSelection = [...(currentSelection || [])];
+      const newSelection = Array.isArray(currentSelection) ? [...currentSelection] : [];
       if (newSelection.includes(oIndex)) {
         setSelectedAnswers({ ...selectedAnswers, [qIndex]: newSelection.filter(ans => ans !== oIndex) });
       } else {
@@ -81,7 +81,6 @@ export default function TakeQuizPage() {
   };
 
   const handleSubmitQuiz = async () => {
-    // Check if every question has been answered
     const allAnswered = quiz.questions.every((q, index) => {
       const answer = selectedAnswers[index];
       return q.questionType === 'multiple' ? answer?.length > 0 : answer !== undefined;
@@ -92,18 +91,22 @@ export default function TakeQuizPage() {
     }
 
     let correctCount = 0;
+    // --- THIS IS THE CORRECTED SCORING LOGIC ---
     quiz.questions.forEach((q, index) => {
       const userAnswer = selectedAnswers[index];
       if (q.questionType === 'multiple') {
+        // Use the correct key `correctAnswers` for multiple choice
         if (arraysAreEqual(userAnswer, q.correctAnswers)) {
           correctCount++;
         }
       } else {
+        // Use the correct key `correctAnswer` for single choice
         if (userAnswer === q.correctAnswer) {
           correctCount++;
         }
       }
     });
+    // --- END OF CORRECTION ---
 
     const finalScore = (correctCount / quiz.questions.length) * 100;
     setScore(finalScore);
@@ -113,6 +116,8 @@ export default function TakeQuizPage() {
     } catch (error) { toast.error("There was an issue submitting your score."); }
     setQuizFinished(true);
   };
+
+  // --- RENDER LOGIC ---
 
   if (quizError) {
     return (
@@ -129,9 +134,41 @@ export default function TakeQuizPage() {
   if (loading) return <div className="min-h-screen neon-bg flex items-center justify-center"><p className="text-2xl font-display neon-text-main">Loading Transmission...</p></div>;
   if (!quiz) return <div className="min-h-screen neon-bg flex items-center justify-center"><p className="text-2xl font-display neon-text-sub">Signal Lost. Quiz Not Found.</p></div>;
 
-  if (quizFinished) { /* ... (Your existing, styled quizFinished JSX) ... */ }
-  if (!quizStarted) { /* ... (Your existing, styled quizStarted JSX) ... */ }
+  // --- THIS IS THE CORRECTED RENDER FLOW ---
+  // The logic is now separated. We first check if the quiz is finished,
+  // THEN we check if it has started. If neither is true, we show the questions.
+  if (quizFinished) {
+    return (
+      <div className="min-h-screen neon-bg flex items-center justify-center p-4">
+        <div className="neon-card-glass text-center max-w-md w-full">
+          <h2 className="text-3xl font-bold neon-text-main mb-4 font-display">Quiz Complete!</h2>
+          <p className="text-xl text-cyan-200 mb-6">Great job, {takerName}!</p>
+          <p className="text-2xl text-gray-400">Your Score:</p>
+          <p className="text-7xl font-bold text-green-400 my-4">{score.toFixed(0)}%</p>
+          <Link to="/" className="neon-button neon-button-primary font-display mt-4">Back to Home</Link>
+        </div>
+      </div>
+    );
+  }
 
+  // If the quiz is NOT started, show the name entry screen.
+  if (!quizStarted) {
+    return (
+      <div className="min-h-screen neon-bg flex items-center justify-center p-4 pt-24">
+        <Toaster position="top-center" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
+        <div className="neon-card-glass max-w-md w-full text-center">
+          <h1 className="text-4xl font-bold mb-2 neon-text-main font-display">{quiz.title}</h1>
+          <p className="text-cyan-200 mb-8">Enter your name to begin.</p>
+          <form onSubmit={handleStartQuiz}>
+            <input type="text" value={takerName} onChange={(e) => setTakerName(e.target.value)} placeholder="Your Name" className="neon-input" />
+            <button type="submit" className="w-full mt-6 neon-button neon-button-primary font-display">Start Quiz</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+  
+  // If we reach here, it means the quiz HAS started and is NOT finished. Show the questions.
   return (
     <div className="neon-bg pt-24">
       <Toaster position="top-center" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
@@ -140,12 +177,8 @@ export default function TakeQuizPage() {
         <div className="space-y-8">
           {quiz.questions.map((question, qIndex) => (
             <div key={qIndex} className="neon-card-glass">
-              <p className="text-xl font-semibold mb-4 text-cyan-200">
-                <span className="font-bold mr-2 font-display">Q{qIndex + 1}:</span>{question.text}
-              </p>
-              <p className="text-sm text-gray-400 mb-4 font-display uppercase tracking-wider">
-                {question.questionType === 'multiple' ? 'Select all that apply' : 'Select one answer'}
-              </p>
+              <p className="text-xl font-semibold mb-4 text-cyan-200"><span className="font-bold mr-2 font-display">Q{qIndex + 1}:</span>{question.text}</p>
+              <p className="text-sm text-gray-400 mb-4 font-display uppercase tracking-wider">{question.questionType === 'multiple' ? 'Select all that apply' : 'Select one answer'}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {question.options.map((option, oIndex) => {
                   const isSelected = question.questionType === 'multiple'
