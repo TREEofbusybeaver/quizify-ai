@@ -7,10 +7,15 @@ Quizify AI is a full-stack web application designed to bring quiz creation into 
 ---
 
 📸 Screenshots
+
 Home Page - Clean and Modern Interface
+
 <img width="1887" height="959" alt="QUIZIFY AI Home" src="https://github.com/user-attachments/assets/f7d0791f-f9d7-402b-9d4c-06102f224f66" />
 
+
+
 Creator Dashboard - Manage Your Quizzes with Ease
+
 <img width="1884" height="982" alt="QUIZIFY AI Dashboard" src="https://github.com/user-attachments/assets/801184c6-d97c-4ceb-94f4-149d3ad5ccda" />
 
 ---
