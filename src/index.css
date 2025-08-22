@@ -131,11 +131,28 @@
     animation: neon-flicker-continuous 4s infinite linear;
   }
 
+  /* --- NEW: Keyframe animation for the MAGENTA text flicker --- */
+  @keyframes neon-flicker-magenta-continuous {
+    0%, 100% {
+      opacity: 1;
+      text-shadow: 0 0 5px rgba(var(--neon-magenta-rgb), 0.9), 0 0 10px rgba(var(--neon-magenta-rgb), 0.7), 0 0 20px rgba(var(--neon-magenta-rgb), 0.4);
+    }
+    20% {
+      opacity: 0.8;
+      text-shadow: 0 0 4px rgba(var(--neon-magenta-rgb), 0.7), 0 0 8px rgba(var(--neon-magenta-rgb), 0.5), 0 0 15px rgba(var(--neon-magenta-rgb), 0.3);
+    }
+    22% { opacity: 1; }
+    30% {
+      opacity: 0.7;
+      text-shadow: 0 0 5px rgba(var(--neon-magenta-rgb), 0.8), 0 0 10px rgba(var(--neon-magenta-rgb), 0.6);
+    }
+    32% { opacity: 1; }
+  }
+
+  /* Neon Text Effects - Sub/Magenta text now also flickers */
   .neon-text-sub {
     color: var(--neon-magenta);
-    text-shadow:
-      0 0 5px rgba(var(--neon-magenta-rgb), 0.9),
-      0 0 10px rgba(var(--neon-magenta-rgb), 0.6);
+    animation: neon-flicker-magenta-continuous 4s infinite linear;
   }
 
   /* Base button style */
@@ -169,6 +186,11 @@
     background: rgba(var(--neon-magenta-rgb), 0.06);
     transform: scale(1.05);
     box-shadow: 0 0 12px rgba(var(--neon-magenta-rgb), 0.45), 0 0 28px rgba(var(--neon-magenta-rgb), 0.20);
+  }
+
+  /* --- NEW: Small button variant for UI elements --- */
+  .neon-button-sm {
+    @apply py-2 px-5 text-sm;
   }
 
   /* Glassmorphism Card style - UPDATED with no default glow */
