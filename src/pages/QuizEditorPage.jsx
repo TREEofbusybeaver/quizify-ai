@@ -7,12 +7,11 @@ import { collection, addDoc } from 'firebase/firestore';
 import toast, { Toaster } from 'react-hot-toast';
 import AIQuizGenerator from '../components/AIQuizGenerator';
 
-// Template for a new question, now includes questionType
 const newQuestionTemplate = { 
   text: '', 
   options: ['', '', '', ''], 
-  questionType: 'single', // 'single' or 'multiple'
-  correctAnswer: 0 // Will become an array for 'multiple' type
+  questionType: 'single',
+  correctAnswer: 0
 };
 
 export default function QuizEditorPage() {
@@ -23,7 +22,6 @@ export default function QuizEditorPage() {
   const [loading, setLoading] = useState(false);
 
   // --- Handlers for Form Changes ---
-
   const handleQuestionTextChange = (qIndex, newText) => {
     const updatedQuestions = [...questions];
     updatedQuestions[qIndex].text = newText;
@@ -79,7 +77,7 @@ export default function QuizEditorPage() {
       if (!q.text.trim() || q.options.some(opt => !opt.trim())) {
         return toast.error("All question and option fields must be filled.");
       }
-      if (q.questionType === 'multiple' && q.correctAnswer.length === 0) {
+      if (q.questionType === 'multiple' && (!Array.isArray(q.correctAnswer) || q.correctAnswer.length === 0)) {
         return toast.error(`Please select at least one correct answer for Question ${questions.indexOf(q) + 1}.`);
       }
     }
@@ -91,7 +89,7 @@ export default function QuizEditorPage() {
             text: q.text,
             options: q.options,
             questionType: 'multiple',
-            correctAnswers: q.correctAnswer.sort()
+            correctAnswers: Array.isArray(q.correctAnswer) ? q.correctAnswer.sort() : []
           };
         }
         return {
@@ -106,7 +104,8 @@ export default function QuizEditorPage() {
         creatorId: currentUser.uid,
         title: title,
         questions: questionsForFirestore,
-        createdAt: new Date()
+        createdAt: new Date(),
+        isActive: true
       });
       toast.success("Quiz saved successfully!");
       navigate('/dashboard');
@@ -129,40 +128,50 @@ export default function QuizEditorPage() {
   };
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen p-4 sm:p-8">
+    <div className="neon-bg pt-24 min-h-screen">
       <Toaster position="top-center" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8">Quiz Editor</h1>
-        
-        {/* AI GENERATOR IS CORRECTLY PLACED HERE */}
-        <AIQuizGenerator onQuizGenerated={handleAIQuizGenerated} setLoading={setLoading} />
 
-        <div className="mb-8">
-          <label htmlFor="quizTitle" className="text-lg font-semibold text-gray-300">Quiz Title</label>
+      <div className="max-w-4xl mx-auto p-4 sm:p-8">
+        <h1 className="text-5xl font-bold text-center mb-10 neon-text-main font-display filter drop-shadow-glow-cyan">
+          Quiz Editor
+        </h1>
+        
+        {/* AI Generator Section */}
+        <div className="neon-card-glass mb-8 glow-on-hover-cyan">
+          <AIQuizGenerator onQuizGenerated={handleAIQuizGenerated} setLoading={setLoading} />
+        </div>
+
+        {/* Quiz Title Section */}
+        <div className="neon-card-glass mb-8 glow-on-hover-cyan">
+          <label htmlFor="quizTitle" className="text-xl font-bold text-cyan-300 font-display">Quiz Title</label>
           <input 
             type="text" 
             id="quizTitle" 
             value={title} 
             onChange={(e) => setTitle(e.target.value)} 
-            placeholder="e.g., General Knowledge Challenge" 
-            className="w-full mt-2 p-3 bg-gray-700 rounded-md border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+            placeholder="e.g., The Ultimate Sci-Fi Challenge" 
+            className="w-full mt-4 p-3 neon-input" 
           />
         </div>
 
-        <div className="space-y-6">
+        {/* Questions Section */}
+        <div className="space-y-8">
           {questions.map((question, qIndex) => (
-            <div key={qIndex} className="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <div key={qIndex} className="neon-card-glass glow-on-hover-cyan">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Question {qIndex + 1}</h3>
-                <button onClick={() => removeQuestion(qIndex)} className="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-md">&times; Remove</button>
+                <h3 className="text-2xl font-bold text-cyan-200 font-display">Question {qIndex + 1}</h3>
+                {questions.length > 1 && (
+                  <button onClick={() => removeQuestion(qIndex)} className="text-red-400 hover:text-red-300 font-bold text-sm uppercase font-display tracking-wider">
+                    &times; Remove
+                  </button>
+                )}
               </div>
-
-              {/* TEXT AREA FOR QUESTION - NOW CORRECTLY WIRED */}
+              
               <textarea 
                 value={question.text} 
                 onChange={(e) => handleQuestionTextChange(qIndex, e.target.value)} 
-                placeholder={`Enter text for question ${qIndex + 1}`} 
-                className="w-full min-h-[80px] p-3 bg-gray-700 rounded-md border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+                placeholder={`Enter question text...`} 
+                className="w-full min-h-[100px] p-3 neon-input" 
               />
 
               <div className="my-4">
@@ -183,7 +192,7 @@ export default function QuizEditorPage() {
                   <div key={oIndex} className="flex items-center gap-3">
                     <input 
                       type={question.questionType === 'single' ? 'radio' : 'checkbox'} 
-                      name={`correct-answer-${qIndex}`} // name is needed for radio button groups
+                      name={`correct-answer-${qIndex}`} 
                       checked={
                         question.questionType === 'single' 
                           ? question.correctAnswer === oIndex 
@@ -192,7 +201,6 @@ export default function QuizEditorPage() {
                       onChange={() => handleCorrectAnswerChange(qIndex, oIndex)} 
                       className="w-5 h-5 text-blue-500 bg-gray-700 border-gray-600 rounded focus:ring-blue-500" 
                     />
-                    {/* TEXT INPUT FOR OPTION - NOW CORRECTLY WIRED */}
                     <input 
                       type="text" 
                       value={option} 

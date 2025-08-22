@@ -1,4 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
+// src/components/Navbar.jsx
+
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -9,43 +11,44 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      toast.success("You have been logged out.");
-      navigate('/');
-    } catch (error) {
-      console.error("Failed to log out:", error);
-      toast.error("Failed to log out.");
-    }
+    await signOut(auth);
+    toast.success("You have been logged out.");
+    navigate('/');
+  };
+
+  const activeLinkStyle = {
+    color: 'var(--neon-cyan)',
+    textShadow: '0 0 5px rgba(var(--neon-cyan-rgb), 0.7)',
   };
 
   return (
-    <nav className="bg-gray-900/80 backdrop-blur-md text-white shadow-lg sticky top-0 z-50">
+    // The key changes: `sticky top-0` and `bg-dark-bg/80 backdrop-blur-lg`
+    <nav className="bg-dark-bg/60 backdrop-blur-lg border-b border-neon-cyan/20 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-24">
           <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold text-blue-400">
+            <Link to="/" className="text-3xl font-bold neon-text-main font-display filter drop-shadow-glow-cyan">
               Quizify AI
             </Link>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {currentUser ? (
               <>
-                <Link to="/dashboard" className="text-gray-300 hover:text-white transition duration-200">
+                <NavLink to="/dashboard" className="text-gray-300 hover:text-white transition duration-200 text-lg font-sans" style={({ isActive }) => isActive ? activeLinkStyle : undefined}>
                   Dashboard
-                </Link>
-                <button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                </NavLink>
+                <button onClick={handleLogout} className="font-display uppercase tracking-wider text-neon-magenta border-2 border-neon-magenta rounded-md py-2 px-5 transition-all duration-300 hover:bg-neon-magenta/10 hover:shadow-glow-magenta">
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-gray-300 hover:text-white transition duration-200">
+                <NavLink to="/login" className="text-gray-300 hover:text-white transition duration-200 text-lg font-sans" style={({ isActive }) => isActive ? activeLinkStyle : undefined}>
                   Login
-                </Link>
-                <Link to="/signup" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                </NavLink>
+                <NavLink to="/signup" className="font-display uppercase tracking-wider text-neon-cyan border-2 border-neon-cyan rounded-md py-2 px-5 transition-all duration-300 hover:bg-neon-cyan/10 hover:shadow-glow-cyan">
                   Sign Up
-                </Link>
+                </NavLink>
               </>
             )}
           </div>

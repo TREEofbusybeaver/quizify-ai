@@ -1,3 +1,4 @@
+// src/pages/SignUpPage.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
@@ -13,12 +14,18 @@ export default function SignUpPage() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) return toast.error("Passwords do not match!");
-    if (password.length < 6) return toast.error("Password should be at least 6 characters.");
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
     setLoading(true);
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      toast.success("Account created successfully!");
+      toast.success("Resistance joined. Welcome.");
       navigate('/dashboard');
     } catch (error) {
       toast.error(error.message);
@@ -28,29 +35,50 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-[90vh] flex items-center justify-center bg-gray-900">
+    // Added pt-24 to create space for the sticky navbar
+    <div className="min-h-screen neon-bg flex items-center justify-center p-4 pt-24">
       <Toaster position="top-center" toastOptions={{ style: { background: '#333', color: '#fff' } }} />
-      <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-bold text-center text-white">Create Your Account</h2>
+      <div className="neon-card-glass max-w-md w-full glow-on-hover-magenta">
+        <h2 className="text-3xl font-bold text-center neon-text-sub mb-8 font-display filter drop-shadow-glow-magenta">
+          JOIN THE RESISTANCE
+        </h2>
         <form onSubmit={handleSignUp} className="space-y-6">
           <div>
-            <label htmlFor="email" className="text-sm font-bold text-gray-400">Email Address</label>
-            <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-2 mt-2 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              required 
+              className="neon-input" 
+            />
           </div>
           <div>
-            <label htmlFor="password" className="text-sm font-bold text-gray-400">Password</label>
-            <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-2 mt-2 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              required 
+              className="neon-input" 
+            />
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="text-sm font-bold text-gray-400">Confirm Password</label>
-            <input type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="w-full px-4 py-2 mt-2 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input 
+              type="password" 
+              placeholder="Confirm Password" 
+              value={confirmPassword} 
+              onChange={(e) => setConfirmPassword(e.target.value)} 
+              required 
+              className="neon-input" 
+            />
           </div>
-          <button type="submit" disabled={loading} className="w-full py-3 font-bold text-white bg-green-600 rounded-md hover:bg-green-700 disabled:bg-gray-500 transition duration-300">
-            {loading ? 'Creating Account...' : 'Sign Up'}
+          <button type="submit" disabled={loading} className="neon-button neon-button-secondary w-full font-display">
+            {loading ? 'INITIALIZING...' : 'SIGN UP'}
           </button>
         </form>
-        <p className="text-center text-gray-400">
-          Already have an account? <Link to="/login" className="text-blue-400 hover:underline">Login</Link>
+        <p className="text-center mt-6 text-cyan-300">
+          Already have access? <Link to="/login" className="font-bold text-neon-cyan hover:underline">Login Here</Link>
         </p>
       </div>
     </div>
