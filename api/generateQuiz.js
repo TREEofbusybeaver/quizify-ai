@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Text must be at least 50 characters long.' });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-3.0-flash-preview" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const prompt = `Based on the following text, generate a multiple-choice quiz with 5 questions. The response MUST be a valid JSON object ONLY. Do not include any text, markdown formatting like \`\`\`json, or explanations before or after the JSON object. The JSON object should have a single key "questions", which is an array of question objects. Each object must have "text", "options" (an array of 4 strings), and "correctAnswer" (a 0-indexed integer). Text: """${text}"""`;
 
     console.log("Sending prompt to Google AI...");
